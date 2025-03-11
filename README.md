@@ -67,11 +67,11 @@
 
 2. Редактирование рецепта с JS-таблицей ингредиентов:
 
-(пример скриншота)
+![Скриншот главной страницы](https://github.com/qisseyt/web_cookbook/raw/images/images/2.jpg)
 
 3. Поиск с выбором категории, названием и ингредиентом:
 
-(пример скриншота)
+![Скриншот главной страницы](https://github.com/qisseyt/web_cookbook/raw/images/images/3.jpg)
 
 ---
 
