@@ -1,0 +1,73 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2>Поиск рецептов</h2>
+
+<form method="POST" class="mb-4">
+  <div class="mb-3">
+    <label class="form-label">Название (частично):</label>
+    <input type="text" name="name" class="form-control">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Ингредиент (частично):</label>
+    <input type="text" name="ingredient" class="form-control">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Категория (точное совпадение):</label>
+    <select name="category" class="form-select">
+      <option value="">(Все)</option>
+      {% for cat in all_categories %}
+      <option value="{{ cat }}">{{ cat }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <button type="submit" class="btn btn-primary">Искать</button>
+</form>
+
+{% if results is not none %}
+  <hr>
+  <h4>Результаты поиска:</h4>
+  {% if results %}
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+      {% for r in results %}
+      <div class="col">
+        <div class="card h-100">
+          {% if r.image_url %}
+          <img src="{{ r.image_url }}" alt="Recipe"
+               class="card-img-top img-fluid"
+               style="max-height:200px; object-fit:cover;">
+          {% endif %}
+          <div class="card-body">
+            <h5 class="card-title">{{ r.name }}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">Категория: {{ r.category }}</h6>
+            <p class="card-text">
+              {{ r.steps[:100] }}{% if r.steps|length > 100 %}...{% endif %}
+            </p>
+          </div>
+          <ul class="list-group list-group-flush">
+            {% for ing in r.ingredients[:3] %}
+            <li class="list-group-item">
+              {{ ing.name }}: {{ ing.amount }} {{ ing.unit }}
+            </li>
+            {% endfor %}
+            {% if r.ingredients|length > 3 %}
+            <li class="list-group-item text-muted">
+              и ещё {{ r.ingredients|length - 3 }}...
+            </li>
+            {% endif %}
+          </ul>
+          <div class="card-body">
+            <a href="{{ url_for('view_recipe', recipe_id=r.id) }}"
+               class="btn btn-info">
+              Просмотр
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>Ничего не найдено.</p>
+  {% endif %}
+{% endif %}
+{% endblock %}

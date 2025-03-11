@@ -1,0 +1,124 @@
+{% extends 'layout.html' %}
+
+{% block head_scripts %}
+<script>
+  let ingredients = []; // Будем хранить массив объектов {name, amount, unit}
+
+  function renderIngredients() {
+    const container = document.getElementById("ingredients-table-body");
+    container.innerHTML = "";
+    ingredients.forEach((ing, index) => {
+      const row = document.createElement("tr");
+
+      // Название
+      const nameTd = document.createElement("td");
+      const nameInput = document.createElement("input");
+      nameInput.type = "text";
+      nameInput.className = "form-control";
+      nameInput.value = ing.name;
+      nameInput.onchange = e => { ing.name = e.target.value; };
+      nameTd.appendChild(nameInput);
+
+      // Кол-во
+      const amountTd = document.createElement("td");
+      const amountInput = document.createElement("input");
+      amountInput.type = "number";
+      amountInput.step = "0.1";
+      amountInput.className = "form-control";
+      amountInput.value = ing.amount;
+      amountInput.onchange = e => { ing.amount = parseFloat(e.target.value) || 0; };
+      amountTd.appendChild(amountInput);
+
+      // Ед. изм.
+      const unitTd = document.createElement("td");
+      const unitInput = document.createElement("input");
+      unitInput.type = "text";
+      unitInput.className = "form-control";
+      unitInput.value = ing.unit;
+      unitInput.onchange = e => { ing.unit = e.target.value; };
+      unitTd.appendChild(unitInput);
+
+      // Удалить
+      const delTd = document.createElement("td");
+      const delBtn = document.createElement("button");
+      delBtn.className = "btn btn-danger btn-sm";
+      delBtn.textContent = "Удалить";
+      delBtn.onclick = () => {
+        ingredients.splice(index, 1);
+        renderIngredients();
+      };
+      delTd.appendChild(delBtn);
+
+      row.appendChild(nameTd);
+      row.appendChild(amountTd);
+      row.appendChild(unitTd);
+      row.appendChild(delTd);
+
+      container.appendChild(row);
+    });
+  }
+
+  function addIngredient() {
+    ingredients.push({name: "", amount: 0, unit: ""});
+    renderIngredients();
+  }
+
+  function beforeSubmit() {
+    // Сериализуем ingredients в JSON и записываем в hidden
+    const hiddenField = document.getElementById("ingredients_json");
+    hiddenField.value = JSON.stringify(ingredients);
+  }
+</script>
+{% endblock %}
+
+{% block content %}
+<h2>Добавить рецепт</h2>
+<form method="POST" enctype="multipart/form-data" onsubmit="beforeSubmit()">
+  <div class="mb-3">
+    <label>Название</label>
+    <input type="text" name="name" class="form-control" required>
+  </div>
+  <div class="mb-3">
+    <label>Категория</label>
+    <input type="text" name="category" class="form-control">
+  </div>
+  <div class="mb-3">
+    <label>Шаги приготовления</label>
+    <textarea name="steps" class="form-control" rows="3"></textarea>
+  </div>
+  <div class="mb-3">
+    <label>Картинка</label>
+    <input type="file" name="image" class="form-control">
+  </div>
+
+  <div class="mb-3">
+    <label>Ингредиенты</label>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Название</th>
+          <th>Кол-во</th>
+          <th>Ед. изм.</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="ingredients-table-body">
+        <!-- наполняется JS -->
+      </tbody>
+    </table>
+    <button type="button" class="btn btn-secondary" onclick="addIngredient()">
+      Добавить ингредиент
+    </button>
+    <input type="hidden" name="ingredients_json" id="ingredients_json" value="">
+  </div>
+
+  <button type="submit" class="btn btn-success">Сохранить</button>
+</form>
+
+<script>
+  // При загрузке - пустой массив
+  // Если нужно начальное значение, можно задать (но для new обычно всё пустое)
+  ingredients = [];
+  renderIngredients();
+</script>
+{% endblock %}

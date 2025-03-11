@@ -1,0 +1,138 @@
+{% extends 'layout.html' %}
+
+{% block head_scripts %}
+<script>
+  let ingredients = [];
+
+  function renderIngredients() {
+    const container = document.getElementById("ingredients-table-body");
+    container.innerHTML = "";
+
+    ingredients.forEach((ing, idx) => {
+      const row = document.createElement("tr");
+
+      // Название
+      let nameTd = document.createElement("td");
+      let nameInput = document.createElement("input");
+      nameInput.type = "text";
+      nameInput.className = "form-control";
+      nameInput.value = ing.name;
+      nameInput.onchange = e => { ing.name = e.target.value; };
+      nameTd.appendChild(nameInput);
+
+      // Кол-во
+      let amountTd = document.createElement("td");
+      let amountInput = document.createElement("input");
+      amountInput.type = "number";
+      amountInput.step = "0.1";
+      amountInput.className = "form-control";
+      amountInput.value = ing.amount;
+      amountInput.onchange = e => { ing.amount = parseFloat(e.target.value) || 0; };
+      amountTd.appendChild(amountInput);
+
+      // Ед. изм.
+      let unitTd = document.createElement("td");
+      let unitInput = document.createElement("input");
+      unitInput.type = "text";
+      unitInput.className = "form-control";
+      unitInput.value = ing.unit;
+      unitInput.onchange = e => { ing.unit = e.target.value; };
+      unitTd.appendChild(unitInput);
+
+      // Удалить
+      let delTd = document.createElement("td");
+      let delBtn = document.createElement("button");
+      delBtn.className = "btn btn-danger btn-sm";
+      delBtn.textContent = "Удалить";
+      delBtn.onclick = () => {
+        ingredients.splice(idx, 1);
+        renderIngredients();
+      };
+      delTd.appendChild(delBtn);
+
+      row.appendChild(nameTd);
+      row.appendChild(amountTd);
+      row.appendChild(unitTd);
+      row.appendChild(delTd);
+      container.appendChild(row);
+    });
+  }
+
+  function addIngredient() {
+    ingredients.push({ name:"", amount:0, unit:"" });
+    renderIngredients();
+  }
+
+  function beforeSubmit() {
+    // Сериализуем массив ingredients в JSON
+    document.getElementById("ingredients_json").value = JSON.stringify(ingredients);
+  }
+</script>
+{% endblock %}
+
+{% block content %}
+<h2>Редактировать рецепт (ID={{ recipe.id }})</h2>
+
+<form method="POST" enctype="multipart/form-data" onsubmit="beforeSubmit()">
+  <!-- Остальные поля (название, категория, шаги, картинка) не трогаем -->
+  <div class="mb-3">
+    <label>Название</label>
+    <input type="text" name="name" class="form-control"
+           value="{{ recipe.name }}" required>
+  </div>
+  <div class="mb-3">
+    <label>Категория</label>
+    <input type="text" name="category" class="form-control"
+           value="{{ recipe.category }}">
+  </div>
+  <div class="mb-3">
+    <label>Шаги приготовления</label>
+    <textarea name="steps" class="form-control" rows="3">{{ recipe.steps }}</textarea>
+  </div>
+  <div class="mb-3">
+    <label>Картинка (загрузите новую, если надо изменить)</label>
+    {% if recipe.image_url %}
+    <div class="mb-2">
+      <img src="{{ recipe.image_url }}" alt="Recipe"
+           class="img-fluid"
+           style="max-width:200px; max-height:200px; object-fit:cover;">
+    </div>
+    {% endif %}
+    <input type="file" name="image" class="form-control">
+  </div>
+
+  <!-- Наш новый блок ингредиентов -->
+  <div class="mb-3">
+    <label>Ингредиенты</label>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Название</th>
+          <th>Кол-во</th>
+          <th>Ед. изм.</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="ingredients-table-body">
+        <!-- JS заполнит -->
+      </tbody>
+    </table>
+    <button type="button" class="btn btn-secondary" onclick="addIngredient()">
+      Добавить ингредиент
+    </button>
+
+    <!-- скрытое поле для JSON -->
+    <input type="hidden" name="ingredients_json" id="ingredients_json" value="">
+  </div>
+
+  <button type="submit" class="btn btn-success">Сохранить изменения</button>
+  <a href="{{ url_for('index') }}" class="btn btn-secondary">Отмена</a>
+</form>
+
+<script>
+  // При загрузке страницы: берем Python-список recipe.ingredients -> JSON
+  const initIngs = {{ recipe.ingredients|tojson }};
+  ingredients = initIngs;
+  renderIngredients();
+</script>
+{% endblock %}
