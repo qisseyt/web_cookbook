@@ -1,60 +1,51 @@
-name: Tests
+name: Run Tests and Generate Coverage Report
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      # Шаг 1: Checkout repository
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    # 1. Checkout the repository
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      # Шаг 2: Set up Python
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
+    # 2. Set up Python
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
 
-      # Шаг 3: Install dependencies
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install coverage pytest
+    # 3. Install dependencies
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install coverage pytest
 
-      # Шаг 4: Run tests and generate coverage report
-      - name: Run tests with coverage
-        run: |
-          coverage run --source=. -m pytest || true  # Запускаем тесты, игнорируя ошибки
-          rm -f coverage.txt  # Удаляем старый отчет, если он есть в корне
-          coverage report -m > coverage.txt  # Генерируем новый отчет в корне репозитория
-          
-      # Шаг 5: Verify coverage report exists
-      - name: Verify coverage report exists
-        run: |
-          ls -l  # Показываем содержимое корня репозитория
-          cat coverage.txt || echo "coverage.txt not found"  # Показываем содержимое отчета
+    # 4. Run tests with coverage
+    - name: Run tests and generate coverage report
+      run: |
+        coverage run --source=. -m pytest  # Запуск тестов с покрытием
+        coverage report -m               # Вывод отчета в консоль
+        coverage html                    # Генерация HTML отчета
+        coverage xml                     # Генерация XML отчета для более подробного анализа
 
-      # Шаг 6: Set Git identity
-      - name: Set Git identity
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
+    # 5. Upload coverage report as an artifact
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report
+        path: coverage.xml   # Загружаем XML отчет как артефакт
 
-      # Шаг 7: Add changes to git
-      - name: Add changes to git
-        run: |
-          git status  # Показываем статус, чтобы проверить, что файлы есть
-          git add .coverage coverage.txt  # Добавляем отчет и другие изменения в индекс
-          git diff --cached --quiet || git commit -m "Add or update coverage report"  # Коммитим изменения, если есть
-
-      # Шаг 8: Push changes to the repository
-      - name: Push changes to the repository
-        run: |
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main  # Пушим изменения в ветку main
+    # 6. Show test results in the GitHub Actions logs
+    - name: Display test results
+      run: |
+        tail -n 20 coverage_report.txt  # Выводим последние 20 строк отчета для удобства
