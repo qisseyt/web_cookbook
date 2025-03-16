@@ -23,6 +23,3 @@ def test_index_page(client):
 
     # Проверяем, что в ответе содержится строка "Список рецептов", закодированная в UTF-8 
     assert "Список рецептов".encode("utf-8") in resp.data
-
-    # Проверяем
-    assert "То чего точно нет".encode("utf-8") in resp.data
