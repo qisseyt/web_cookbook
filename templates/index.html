@@ -2,7 +2,7 @@
 {% block content %}
 <h2>Список рецептов</h2>
 {% if recipes %}
-<!-- Форма фильтра по категориям -->
+<!-- .Форма фильтра по категориям. -->
 <form method="GET" action="{{ url_for('index') }}" class="mb-3">
   <label class="form-label">Фильтр по категории:</label>
   <select name="category" class="form-select" style="width:auto; display:inline-block;">
