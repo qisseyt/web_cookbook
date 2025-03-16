@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "id": 2,
+    "name": "в",
+    "category": "Вегетарианское",
+    "ingredients": [
+      {
+        "name": "ваыв",
+        "amount": 33,
+        "unit": "2в"
+      }
+    ],
+    "steps": "ываыва",
+    "image_url": ""
+  }
+]
