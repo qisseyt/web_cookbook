@@ -31,9 +31,9 @@ jobs:
       # Шаг 4: Run tests and generate coverage report
       - name: Run tests with coverage
         run: |
-          coverage run --source=. -m pytest || true
-          mkdir -p coverage_reports  # Если папка уже существует, она не будет пересоздана
-          coverage report -m > coverage_reports/coverage.txt  # Перезаписываем отчет, если он уже существует
+          coverage run --source=. -m pytest  # Запускаем тесты с покрытием
+          mkdir -p coverage_reports  # Создаем папку для отчетов, если она не существует
+          coverage report -m > coverage_reports/coverage.txt  # Генерируем отчет с пропущенными строками
 
       # Шаг 5: Commit and push coverage report to main branch
       - name: Commit and push coverage report to main branch
