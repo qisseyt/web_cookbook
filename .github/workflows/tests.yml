@@ -22,7 +22,6 @@ jobs:
           python-version: "3.10"
 
       # Шаг 3: Install dependencies
-      - name: Install dependencies
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
@@ -32,8 +31,8 @@ jobs:
       - name: Run tests with coverage
         run: |
           coverage run --source=. -m pytest
-          mkdir -p coverage_reports  # Создаем папку для отчетов
-          coverage report -m > coverage_reports/coverage.txt  # Сохраняем отчет в указанную папку
+          mkdir -p coverage_reports  # Если папка уже существует, она не будет пересоздана
+          coverage report -m > coverage_reports/coverage.txt  # Перезаписываем отчет, если он уже существует
 
       # Шаг 5: Commit and push coverage report to main branch
       - name: Commit and push coverage report to main branch
@@ -41,5 +40,5 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
           git add coverage_reports/coverage.txt  # Добавляем отчет в индекс
-          git commit -m "Add coverage report"  # Коммитим отчет
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main  # Используем GITHUB_TOKEN для аутентификации
+          git commit -m "Add or update coverage report"  # Коммитим отчет
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main  # Пушим изменения в ветку main
