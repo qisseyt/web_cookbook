@@ -1,7 +1,7 @@
 from app import app
 import pytest
 
-# Фикстура pytest для создания тестового клиента Flask
+# Фикстура pytest для создания тестового клиента Flask.
 
 @pytest.fixture
 def client():
