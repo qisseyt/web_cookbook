@@ -31,11 +31,12 @@ jobs:
       # Шаг 4: Run tests and generate coverage report
       - name: Run tests with coverage
         run: |
+          # Запускаем тесты и генерируем отчет
           coverage run --source=. -m pytest || true  # Запускаем тесты, игнорируя ошибки
           mkdir -p coverage_reports  # Создаем папку, если она не существует
           rm -f coverage_reports/coverage.txt  # Удаляем старый отчет, если он есть
           coverage report -m > coverage_reports/coverage.txt  # Генерируем новый отчет
-
+          
       # Шаг 5: Verify coverage report exists
       - name: Verify coverage report exists
         run: |
