@@ -31,21 +31,7 @@ jobs:
         pip install coverage pytest
 
     # 4. Run tests with coverage
-    - name: Run tests and generate coverage report
+    - name: Run tests with coverage
       run: |
         coverage run --source=. -m pytest  # Запуск тестов с покрытием
         coverage report -m               # Вывод отчета в консоль
-        coverage html                    # Генерация HTML отчета
-        coverage xml                     # Генерация XML отчета для более подробного анализа
-
-    # 5. Upload coverage report as an artifact
-    - name: Upload coverage report
-      uses: actions/upload-artifact@v3
-      with:
-        name: coverage-report
-        path: coverage.xml   # Загружаем XML отчет как артефакт
-
-    # 6. Show test results in the GitHub Actions logs
-    - name: Display test results
-      run: |
-        tail -n 20 coverage_report.txt  # Выводим последние 20 строк отчета для удобства
