@@ -7,30 +7,30 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build-and-test:
+  build-test:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.10"
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
 
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install coverage pytest
+    - name: Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install coverage pytest
 
-      - name: Run tests with coverage
-        run: |
-          coverage run --source=. -m pytest
-          coverage report -m > coverage.txt
+    - name: Run tests with coverage
+      run: |
+        coverage run --source=. -m pytest
+        coverage report -m > coverage.txt
 
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v3
-        with:
-            name: coverage-report
-            path: coverage.txt
-
+    - name: Upload coverage report as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report
+        path: coverage.txt
