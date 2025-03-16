@@ -9,6 +9,7 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
 
@@ -26,4 +27,10 @@ jobs:
       - name: Run tests with coverage
         run: |
           coverage run --source=. -m pytest
-          coverage report -m
+          coverage report -m > coverage.txt  # Сохраняем отчет в файл coverage.txt
+
+      - name: Upload coverage report as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: coverage.txt  # Загружаем отчет в виде артефакта
