@@ -22,7 +22,7 @@ jobs:
           python-version: "3.10"
 
       # Шаг 3: Install dependencies
-      - name: Install dependecies
+      - name: Install dependencies
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
@@ -40,6 +40,12 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add coverage_reports/coverage.txt  # Добавляем отчет в индекс
-          git commit -m "Add or update coverage report"  # Коммитим отчет
+          
+          # Добавляем все изменения (включая файл .coverage и отчет)
+          git add .coverage coverage_reports/coverage.txt  # Добавляем нужные файлы в индекс
+          
+          # Проверяем, есть ли изменения, и если да, выполняем коммит и пуш
+          git diff --cached --quiet || git commit -m "Add or update coverage report"  # Коммитим только если есть изменения
+          
+          # Пушим изменения в ветку main
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main  # Пушим изменения в ветку main
