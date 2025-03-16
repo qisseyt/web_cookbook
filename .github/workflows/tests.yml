@@ -11,26 +11,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      # Шаг 1: Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
+      # Шаг 2: Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
+      # Шаг 3: Install dependencies
       - name: Install dependencies
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
           pip install coverage pytest
 
+      # Шаг 4: Run tests and generate coverage report
       - name: Run tests with coverage
         run: |
           coverage run --source=. -m pytest
-          coverage report -m > coverage.txt  # Сохраняем отчет в файл coverage.txt
+          mkdir -p coverage_reports  # Создаем папку для отчетов
+          coverage report -m > coverage_reports/coverage.txt  # Сохраняем отчет в указанную папку
 
-      - name: Upload coverage report as artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: coverage-report
-          path: coverage.txt  # Загружаем отчет в виде артефакта
+      # Шаг 5: Commit and push coverage report to main branch
+      - name: Commit and push coverage report to main branch
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add coverage_reports/coverage.txt  # Добавляем отчет в индекс
+          git commit -m "Add coverage report"  # Коммитим отчет
+          git push origin main  # Пушим изменения в ветку main
+
