@@ -31,7 +31,6 @@ jobs:
       # Шаг 4: Run tests and generate coverage report
       - name: Run tests with coverage
         run: |
-          # Запускаем тесты и генерируем отчет
           coverage run --source=. -m pytest || true  # Запускаем тесты, игнорируя ошибки
           rm -f coverage.txt  # Удаляем старый отчет, если он есть в корне
           coverage report -m > coverage.txt  # Генерируем новый отчет в корне репозитория
@@ -42,14 +41,20 @@ jobs:
           ls -l  # Показываем содержимое корня репозитория
           cat coverage.txt || echo "coverage.txt not found"  # Показываем содержимое отчета
 
-      # Шаг 6: Add changes to git
+      # Шаг 6: Set Git identity
+      - name: Set Git identity
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+      # Шаг 7: Add changes to git
       - name: Add changes to git
         run: |
           git status  # Показываем статус, чтобы проверить, что файлы есть
           git add .coverage coverage.txt  # Добавляем отчет и другие изменения в индекс
           git diff --cached --quiet || git commit -m "Add or update coverage report"  # Коммитим изменения, если есть
 
-      # Шаг 7: Push changes to the repository
+      # Шаг 8: Push changes to the repository
       - name: Push changes to the repository
         run: |
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }} HEAD:main  # Пушим изменения в ветку main
