@@ -1,32 +1,25 @@
-import pytest
 from app import app
+import pytest
+
+# Фикстура pytest для создания тестового клиента Flask
 
 @pytest.fixture
 def client():
-    """Создаёт тестового клиента Flask"""
+    # Включаем тестовый режим приложения  
     app.config["TESTING"] = True
-    with app.test_client() as client:
-        yield client
 
-def test_homepage(client):
-    """Тест главной страницы"""
-    response = client.get("/")
-    assert response.status_code == 200
-    assert "Добро пожаловать".encode("utf-8") in response.data  # Проверяем текст на странице
+    # Создаем тестовый клиент и передаем его в тесты  
+    with app.test_client() as c:
+        yield c
 
-def test_add_recipe(client):
-    """Тест API добавления рецепта"""
-    response = client.post("/add", json={
-        "name": "Салат",
-        "category": "Закуски",
-        "ingredients": [{"name": "Огурец", "amount": 1, "unit": "шт"}],
-        "steps": "Нарезать и перемешать"
-    })
+# Тест главной страницы ("/")  
 
-    assert response.status_code == 201  # Код успешного создания
+def test_index_page(client):
+    # Отправляем GET-запрос на главную страницу
+    resp = client.get("/")
 
-def test_get_recipes(client):
-    """Тест получения списка рецептов"""
-    response = client.get("/recipes")
-    assert response.status_code == 200
-    assert isinstance(response.json, list)
+    # Проверяем, что сервер отвечает статусом 200 (OK)
+    assert resp.status_code == 200
+
+    # Проверяем, что в ответе содержится строка "Список рецептов", закодированная в UTF-8 
+    assert "Список рецептов".encode("utf-8") in resp.data

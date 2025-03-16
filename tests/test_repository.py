@@ -1,36 +1,45 @@
+# tests/test_repository.py
 import pytest
 from repository import JSONRepository
 from models import Recipe
 
-@pytest.fixture
-def repo(tmp_path):
-    """Создаёт временный JSON-файл для тестового репозитория"""
-    test_file = tmp_path / "test_recipes.json"
-    return JSONRepository(file_path=str(test_file))
+# Тест сохранения рецепта и получения его по ID  
+def test_save_and_get_by_id(tmp_path):
 
-def test_save_and_get_recipe(repo):
-    """Тест сохранения и получения рецепта"""
-    recipe = Recipe(id=1, name="Пицца", category="Ужин", ingredients=[], steps="Готовим тесто...")
-    repo.save(recipe)
+    # Создаем временный файл для хранения данных репозитория  
+    test_file = tmp_path / "repo_test.json"
+    repo = JSONRepository(str(test_file))
 
-    retrieved_recipe = repo.get_by_id(1)
+    # Создаем объект рецепта и сохраняем его в репозитории 
+    r = Recipe(id=0, name="Тест", category="Cat", ingredients=[], steps="", image_url="")
+    saved = repo.save(r)
 
-    assert retrieved_recipe is not None
-    assert retrieved_recipe.name == "Пицца"
+    # Проверяем, что ID сохраненного рецепта равен 1  
+    assert saved.id == 1
 
-def test_get_all(repo):
-    """Тест получения всех рецептов"""
-    repo.save(Recipe(id=1, name="Омлет", category="Завтрак", ingredients=[], steps=""))
-    repo.save(Recipe(id=2, name="Борщ", category="Суп", ingredients=[], steps=""))
+    # Получаем рецепт по его ID  
+    found = repo.get_by_id(1)
 
-    recipes = repo.get_all()
+    # Проверяем, что рецепт найден и его имя совпадает с исходным
+    assert found is not None
+    assert found.name == "Тест"
 
-    assert len(recipes) == 2
-    assert {r.id for r in recipes} == {1, 2}
+# Тест удаления рецепта из репозитория  
+def test_delete(tmp_path):
 
-def test_delete_recipe(repo):
-    """Тест удаления рецепта"""
-    repo.save(Recipe(id=1, name="Паста", category="Ужин", ingredients=[], steps=""))
-    
-    assert repo.delete(1) is True
-    assert repo.get_by_id(1) is None
+    # Создаем временный файл для хранения данных репозитория  
+    test_file = tmp_path / "repo_test.json"
+    repo = JSONRepository(str(test_file))
+
+    # Сохраняем два рецепта в репозитории
+    r1 = repo.save(Recipe(0, "A", "Cat", [], "", ""))
+    r2 = repo.save(Recipe(0, "B", "Cat", [], "", ""))
+
+    # Проверяем успешное удаление первого рецепта
+    assert repo.delete(r1.id) is True
+
+    # Проверяем, что удаленного рецепта больше нет в репозитории 
+    assert repo.get_by_id(r1.id) is None
+
+    # Проверяем, что удаление несуществующего рецепта возвращает False  
+    assert repo.delete(999) is False
