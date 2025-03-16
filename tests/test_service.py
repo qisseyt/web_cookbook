@@ -25,7 +25,7 @@ def test_add_recipe(service):
     assert len(recipe.ingredients) == 1
 
 def test_edit_recipe_not_found(service):
-    # Пытаемся отредактировать несуществующий рецепт
+    # Пытаемся отредактировать несуществующий рецепт.
     with pytest.raises(ValueError):
         service.edit_recipe(
             999,  # Нет такого ID
